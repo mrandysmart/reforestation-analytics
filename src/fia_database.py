@@ -139,8 +139,8 @@ class FIADatabaseConnector:
         query = """
         SELECT 
             c.COUNTYCD as county_code,
-            c.COUNTY as county_name,
-            c.STABBR as state,
+            c.COUNTYNM as county_name,
+            c.STATECD as state,
             COUNT(t.TRE_CN) as total_trees,
             SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
             SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
@@ -151,7 +151,7 @@ class FIADatabaseConnector:
         JOIN PLOT p ON t.PLT_CN = p.PLT_CN
         JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
         WHERE t.SPCD = 202
-        GROUP BY c.COUNTYCD, c.COUNTY, c.STABBR
+        GROUP BY c.COUNTYCD, c.COUNTYNM, c.STATECD
         ORDER BY mortality_rate_pct DESC, total_trees DESC
         """
         return self.execute_query(query)
@@ -205,6 +205,13 @@ class FIADatabaseConnector:
                 nn_indicator = " [NOT NULL]" if col["not_null"] else ""
                 print(f"    - {col['column']}: {col['type']}{pk_indicator}{nn_indicator}")
 
+    def inspect_plot_columns(self) -> None:
+        """Inspect PLOT table to find slope and aspect columns."""
+        schema = self.get_table_schema('PLOT')
+        print(f"\nPLOT table columns:")
+        for col in schema:
+            print(f"  - {col['column']}")
+
 
 def main():
     """Example usage of FIA database connector."""
@@ -218,6 +225,9 @@ def main():
 
         # Explore database schema
         connector.explore_schema()
+
+        # Inspect PLOT table columns
+        connector.inspect_plot_columns()
 
         # Get Douglas-fir statistics
         print(f"\n{'='*60}")
