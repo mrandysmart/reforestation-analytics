@@ -5,7 +5,7 @@
 -- Mortality summary by county
 SELECT 
     c.COUNTYCD as county_code,
-    c.COUNTY as county_name,
+    c.COUNTYNM as county_name,
     c.STABBR as state,
     COUNT(t.TRE_CN) as total_trees,
     SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
@@ -17,12 +17,12 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTYCD, c.COUNTY, c.STABBR
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR
 ORDER BY mortality_rate_pct DESC, total_trees DESC;
 
 -- County-level mortality by survey year (temporal trend)
 SELECT 
-    c.COUNTY as county_name,
+    c.COUNTYNM as county_name,
     c.STABBR as state,
     s.INVYR as inventory_year,
     COUNT(t.TRE_CN) as tree_count,
@@ -34,12 +34,12 @@ JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN SURVEY s ON p.SURVEYCD = s.SURVEYCD
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTY, c.STABBR, s.INVYR
-ORDER BY c.COUNTY, s.INVYR;
+GROUP BY c.COUNTYNM, c.STABBR, s.INVYR
+ORDER BY c.COUNTYNM, s.INVYR;
 
 -- Top 10 counties by Douglas-fir mortality count
 SELECT 
-    c.COUNTY as county_name,
+    c.COUNTYNM as county_name,
     c.STABBR as state,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
     COUNT(t.TRE_CN) as total_trees,
@@ -48,13 +48,13 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202 AND t.STATUSCD = 2
-GROUP BY c.COUNTYCD, c.COUNTY, c.STABBR
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR
 ORDER BY dead_trees DESC
 LIMIT 10;
 
 -- County mortality summary with diameter class breakdown
 SELECT 
-    c.COUNTY as county_name,
+    c.COUNTYNM as county_name,
     c.STABBR as state,
     CASE 
         WHEN t.DIA < 5 THEN 'Seedling (<5")'
@@ -69,8 +69,8 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTYCD, c.COUNTY, c.STABBR, diameter_class
-ORDER BY c.COUNTY, 
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR, diameter_class
+ORDER BY c.COUNTYNM, 
     CASE 
         WHEN diameter_class = 'Seedling (<5")' THEN 1
         WHEN diameter_class = 'Small (5-10")' THEN 2
