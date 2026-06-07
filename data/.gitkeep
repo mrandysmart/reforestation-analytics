@@ -1,0 +1,5 @@
+# This directory is for storing FIA database files
+# Database files are ignored by .gitignore due to their size
+# 
+# Place your FIA_database.db file here or update FIA_DB_PATH in .env
+# to point to your database location
