@@ -6,7 +6,7 @@
 SELECT 
     c.COUNTYCD as county_code,
     c.COUNTYNM as county_name,
-    c.STABBR as state,
+    c.STATECD as state,
     COUNT(t.TRE_CN) as total_trees,
     SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
@@ -17,13 +17,13 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STATECD
 ORDER BY mortality_rate_pct DESC, total_trees DESC;
 
 -- County-level mortality by survey year (temporal trend)
 SELECT 
     c.COUNTYNM as county_name,
-    c.STABBR as state,
+    c.STATECD as state,
     s.INVYR as inventory_year,
     COUNT(t.TRE_CN) as tree_count,
     SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
@@ -34,13 +34,13 @@ JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN SURVEY s ON p.SURVEYCD = s.SURVEYCD
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTYNM, c.STABBR, s.INVYR
+GROUP BY c.COUNTYNM, c.STATECD, s.INVYR
 ORDER BY c.COUNTYNM, s.INVYR;
 
 -- Top 10 counties by Douglas-fir mortality count
 SELECT 
     c.COUNTYNM as county_name,
-    c.STABBR as state,
+    c.STATECD as state,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
     COUNT(t.TRE_CN) as total_trees,
     ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(t.TRE_CN), 2) as mortality_rate_pct
@@ -48,14 +48,14 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202 AND t.STATUSCD = 2
-GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STATECD
 ORDER BY dead_trees DESC
 LIMIT 10;
 
 -- County mortality summary with diameter class breakdown
 SELECT 
     c.COUNTYNM as county_name,
-    c.STABBR as state,
+    c.STATECD as state,
     CASE 
         WHEN t.DIA < 5 THEN 'Seedling (<5")'
         WHEN t.DIA < 10 THEN 'Small (5-10")'
@@ -69,7 +69,7 @@ FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
 WHERE t.SPCD = 202
-GROUP BY c.COUNTYCD, c.COUNTYNM, c.STABBR, diameter_class
+GROUP BY c.COUNTYCD, c.COUNTYNM, c.STATECD, diameter_class
 ORDER BY c.COUNTYNM, 
     CASE 
         WHEN diameter_class = 'Seedling (<5")' THEN 1
