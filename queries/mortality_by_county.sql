@@ -7,10 +7,10 @@ SELECT
     c.COUNTYCD as county_code,
     c.COUNTYNM as county_name,
     c.STATECD as state,
-    COUNT(t.TRE_CN) as total_trees,
+    COUNT(*) as total_trees,
     SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
-    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(t.TRE_CN), 2) as mortality_rate_pct,
+    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(*), 2) as mortality_rate_pct,
     ROUND(AVG(t.DIA), 2) as avg_diameter,
     ROUND(AVG(t.HT), 2) as avg_height
 FROM TREE t
@@ -25,10 +25,10 @@ SELECT
     c.COUNTYNM as county_name,
     c.STATECD as state,
     s.INVYR as inventory_year,
-    COUNT(t.TRE_CN) as tree_count,
+    COUNT(*) as tree_count,
     SUM(CASE WHEN t.STATUSCD = 1 THEN 1 ELSE 0 END) as live_trees,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
-    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(t.TRE_CN), 2) as mortality_rate_pct
+    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(*), 2) as mortality_rate_pct
 FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN SURVEY s ON p.SURVEYCD = s.SURVEYCD
@@ -42,8 +42,8 @@ SELECT
     c.COUNTYNM as county_name,
     c.STATECD as state,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
-    COUNT(t.TRE_CN) as total_trees,
-    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(t.TRE_CN), 2) as mortality_rate_pct
+    COUNT(*) as total_trees,
+    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(*), 2) as mortality_rate_pct
 FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
@@ -62,9 +62,9 @@ SELECT
         WHEN t.DIA < 20 THEN 'Medium (10-20")'
         WHEN t.DIA >= 20 THEN 'Large (>20")'
     END as diameter_class,
-    COUNT(t.TRE_CN) as tree_count,
+    COUNT(*) as tree_count,
     SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) as dead_trees,
-    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(t.TRE_CN), 2) as mortality_rate_pct
+    ROUND(100.0 * SUM(CASE WHEN t.STATUSCD = 2 THEN 1 ELSE 0 END) / COUNT(*), 2) as mortality_rate_pct
 FROM TREE t
 JOIN PLOT p ON t.PLT_CN = p.PLT_CN
 JOIN COUNTY c ON p.COUNTYCD = c.COUNTYCD
